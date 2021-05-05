@@ -1,0 +1,703 @@
+﻿<Window x:Name="MainWindow1" x:Class="KageBunshin.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KageBunshin"
+        mc:Ignorable="d" FontSize="13"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
+        Title="適度にUSTを汚すプラグイン『しちへんげ』" Height="667" Width="1044"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid x:Name="MainPanel" HorizontalAlignment="Left" Width="1030" Margin="4,2,0,-1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="61*"/>
+            <ColumnDefinition Width="305"/>
+            <ColumnDefinition Width="84*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="225*" />
+            <RowDefinition Height="344*"/>
+            <RowDefinition Height="auto" MinHeight="66" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="2" Height="50" Width="230" Grid.Column="1" VerticalAlignment="Center" Margin="0,14,2.665,2" HorizontalAlignment="Right">
+            <Button Content="OK" x:Name="ok" Click="OK" VerticalAlignment="Center" Margin="0,0,0,18" Width="90" />
+            <Button Content="キャンセル" Click="Cancel" VerticalAlignment="Center" Margin="0,0,0,18" Width="90" />
+        </DockPanel>
+        <materialDesign:DrawerHost x:Name="errorDrawer" Grid.RowSpan="3" Grid.ColumnSpan="2" >
+            <materialDesign:DrawerHost.BottomDrawerContent>
+                <TextBlock Margin="20" x:Name="errorText"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </materialDesign:DrawerHost.BottomDrawerContent>
+        </materialDesign:DrawerHost>
+        <materialDesign:DialogHost x:Name="dialogHost" Margin="0,17.29,0,21" Grid.RowSpan="3" Grid.ColumnSpan="2" />
+        <GroupBox Grid.Row="0" Grid.Column="0" x:Name="SelectModulation" Padding="0,9" Margin="10,10,10,10" d:IsLocked="True">
+            <GroupBox.Header>
+                <CheckBox x:Name="SelectModulationBox" Content="Modulationをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0" d:IsLocked="True"/>
+            </GroupBox.Header>
+            <StackPanel x:Name="PanelModulation" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelectModulationBox}">
+                <Grid x:Name="ModulationBiasArea" Background="{x:Null}" Height="89">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="0*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="49" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Margin="10,0,0,0"><Run Text="基準値"/><LineBreak/><Run/></TextBlock>
+                    <Slider Grid.Row="0" Grid.Column="0" x:Name="ModulationBias" RenderTransformOrigin="0.5,0.5" Maximum="100" Minimum="-100" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectModulationBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="180"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=ModulationBias}" Margin="10,10,-60,10" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Margin="0,5,0,0" HorizontalAlignment="Right" Width="128.16" ><Run Text="現在の値からさらにぶらす"/></TextBlock>
+                    <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="SelectModulationBias" Content="" Margin="0,0,-70,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" Height="25" />
+                </Grid>
+                <Grid x:Name="ModulationVarianceArea" RenderTransformOrigin="0.5,0.5" Height="56.29" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="195*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform />
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <TextBlock Grid.Column="0" TextWrapping="Wrap" Margin="0" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)"/>
+                    <Slider Grid.Column="0" x:Name="ModulationVariance" RenderTransformOrigin="0.5,0.5" Margin="0,0,0,0" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True" Width="180" HorizontalAlignment="Left" VerticalAlignment="Center" d:IsHidden="True" >
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=ModulationVariance}" Margin="10,11" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Grid.Column="0" x:Name="SelectVO_PU" Padding="0,9" Margin="10,10,10,10" >
+            <GroupBox.Header>
+                <CheckBox x:Name="SelVO_PUBox" Content="先行発声＋オーバーラップをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
+            </GroupBox.Header>
+            <StackPanel x:Name="SelectVO_PU1" Margin="0,-4,0,0" Width="321" IsEnabled="{Binding IsChecked, ElementName=SelVO_PUBox}">
+                <Grid x:Name="PUBias1" Height="110" Margin="0" Background="{x:Null}">
+                    <Slider x:Name="PUBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,159,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPUBias}" IsDirectionReversed="True">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <ToggleButton x:Name="SelectPUBias" Content="" Height="24" Margin="5.5,66,265,20"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0"><Run Text="先行発声 基準値"/></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらにぶらす"/></TextBlock>
+                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PUBias}" Width="55" Margin="250.5,35,0,0"/>
+                </Grid>
+                <Grid Height="114" Margin="0,0,0.5,0">
+                    <Slider x:Name="PUvar" RenderTransformOrigin="0.5,0.5" Margin="0.5,7,73.5,67" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,87" Height="Auto" Padding="0,0,0,0" Text="先行発声 分散値(ぶれ幅)"/>
+                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PUvar}" Width="55" Margin="250.5,25,0,0"/>
+                </Grid>
+                <Grid Height="110" Margin="0" Background="{x:Null}">
+                    <Slider x:Name="OVBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVOBias}" IsDirectionReversed="True">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <ToggleButton x:Name="SelectVOBias" Content="" Height="24" Margin="5.5,66,265,20"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0"><Run Text="オーバーラップ 基準値"/><LineBreak/><Run/></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=OVBias}" Width="55" Margin="250.5,35,0,0"/>
+                </Grid>
+                <Grid Height="114" Margin="0,0,0.5,0">
+                    <Slider x:Name="OVvar" RenderTransformOrigin="0.5,0.5" Margin="0.5,7,73.5,67" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,92" Height="Auto" Padding="0,0,0,0" Text="オーバーラップ 分散値(ぶれ幅)"/>
+                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=OVvar}" Width="55" Margin="250.5,25,0,0"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="0" Grid.Column="1" x:Name="SelectVelocity" Padding="0,9" Margin="10,10,10,10">
+            <GroupBox.Header>
+                <CheckBox x:Name="SelectVelocityBox" Content="子音速度をランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
+            </GroupBox.Header>
+            <StackPanel x:Name="PanelVelocity" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelectVelocityBox}">
+                <Grid x:Name="VelocityBiasArea" Background="{x:Null}" Height="89">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="0*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="49" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Margin="10,0"><Run Text="基準値"/><LineBreak/><Run/></TextBlock>
+                    <Slider Grid.Row="0" Grid.Column="0" x:Name="VelocityBias" RenderTransformOrigin="0.5,0.5" Maximum="100" Minimum="-100" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVelocityBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="180"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=VelocityBias}" Margin="10,11,-60,11" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Margin="0,5,0,0" HorizontalAlignment="Right" Width="128.16" ><Run Text="現在の値からさらにぶらす"/></TextBlock>
+                    <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="SelectVelocityBias" Content="" Margin="0,0,-70,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" Height="25" />
+                </Grid>
+                <Grid x:Name="VelocityVarianceArea" RenderTransformOrigin="0.5,0.5" Height="56.29" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="195*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform />
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <TextBlock Grid.Column="0" TextWrapping="Wrap" Margin="0" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)"/>
+                    <Slider Grid.Column="0" x:Name="VelocityVariance" RenderTransformOrigin="0.5,0.5" Margin="5,0,10,0" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True" VerticalAlignment="Center" >
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+                    </Slider>
+                    <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=VelocityVariance}" Margin="5,0" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Grid.Column="1" x:Name="SelectFlags" Margin="10,10,10,10" Padding="0,9">
+            <GroupBox.Header>
+                <CheckBox x:Name="SelFlagsBox" Content="フラグをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
+            </GroupBox.Header>
+            <StackPanel x:Name="SelectModulation2" Margin="0,-5,0,-10" Width="321" IsEnabled="{Binding IsChecked, ElementName=SelFlagsBox}">
+                <Grid Height="67.5" Margin="0" Background="{x:Null}">
+                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,35" Height="Auto" Padding="0,0,0,0" Text="値を固定するフラグ"/>
+                    <TextBox x:Name="FixedFlagsSorts" Height="30" TextWrapping="Wrap" Text="Y,a" Width="300" Margin="5.5,35,0,0" FontSize="14"/>
+                </Grid>
+                <Grid Height="95" Margin="0,0,0.5,0">
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,0" Height="55" Padding="0,0,0,0" Text="設定値(上のフラグと順番対応)"/>
+                    <TextBox x:Name="FixedFlagsValue" Height="28" TextWrapping="Wrap" Text="0,100" Width="300" Margin="5.5,25,0,0"/>
+                </Grid>
+                <Grid Height="60" Margin="0,0,0.5,0">
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,0" Height="55" Padding="0,0,0,0" Text="値を変更するフラグ"/>
+                    <TextBox x:Name="VariableFlagsSorts" Height="30" TextWrapping="Wrap" Text="B,g" Width="300" Margin="5.5,25,0,0" FontSize="14"/>
+                </Grid>
+                <Grid Height="110" Margin="0" Background="{x:Null}">
+                    <ToggleButton x:Name="SelectFlagsBias" Content="" Height="24" Margin="5.5,66,265,20"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0" ><Run Text="基準値"/><Run Text="(上のフラグと順番対応)"/><LineBreak/><Run/></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                    <TextBox x:Name="VariableFlagsBiasValue" Height="30" TextWrapping="Wrap" Text="50,0" Width="300" Margin="5.5,35,0,0" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectFlagsBias}"/>
+                </Grid>
+                <Grid Height="114" Margin="0,0,0.5,0">
+                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,87" Height="Auto" Padding="0,0,0,0"><Run Text="分散値"/><Run Text="(上のフラグと順番対応)"/></TextBlock>
+                    <TextBox x:Name="VariableFlagsVarValue" Height="30" TextWrapping="Wrap" Text="20,5" Width="300" Margin="5.5,25,0,0"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="0" Grid.Column="2" x:Name="SelectPitch" Margin="10,10,10,10" Padding="0,9" RenderTransformOrigin="0.5,0.5" Grid.RowSpan="2">
+            <GroupBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform AngleY="-0.335"/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="0.994"/>
+                </TransformGroup>
+            </GroupBox.RenderTransform>
+            <GroupBox.Header>
+                <CheckBox x:Name="SelPitBox" Content="ピッチ/ビブラートをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
+            </GroupBox.Header>
+            <StackPanel x:Name="PanelPitches" Margin="0,-6.972,0,-1.943" Width="659.234" IsEnabled="{Binding IsChecked, ElementName=SelPitBox}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="893.917">
+                <Grid x:Name="ModeSelecter" Height="30.887" Width="655" Margin="2.329,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <ComboBox x:Name="PitchModeSelecter" VerticalAlignment="Top" SelectedIndex="1" Margin="0,0.858,0,0" HorizontalAlignment="Left" Width="645" Height="30">
+                        <ComboBoxItem x:Name="Mode1" Content="Mode1" HorizontalAlignment="Left" Width="319"/>
+                        <ComboBoxItem x:Name="Mode2" Content="Mode2" HorizontalAlignment="Left" Width="319"/>
+                    </ComboBox>
+                </Grid>
+                <StackPanel Height="786.913" Width="657.329" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid x:Name="Poltament" Height="544.851" Width="322.329" VerticalAlignment="Top">
+                        <Grid x:Name="M1Bias" Margin="0,28.522,0,399.271" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:IsHidden="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var" Margin="0,130.887,0,290.981" d:IsHidden="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar" RenderTransformOrigin="0.5,0.5" Margin="-1,20.793,75,68.525" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,104.958" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy7" Margin="0,0,5,-354.696" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias8" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,841.896" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias8" Content="" Height="19.737" Margin="2.329,66.681,133.578,809.536" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="52.329,66.593,128.171,809.566" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy7" Margin="0,454.696,-222.713,-794.661" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar8" RenderTransformOrigin="0.5,0.5" Margin="1.712,-355.509,59.809,1207.457" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,-364.477,55.851,1221.783" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="247.329,-355.986,0,0"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy8" Margin="2.329,160.394,7.671,255.981" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias9" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias9" Content="" Height="24" Margin="7.329,73.05,125.383,27.833" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,23.539,5,76.159" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="62.329,77.106,113.171,14.024" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy8" Margin="2.329,262.104,7.671,170.528" RenderTransformOrigin="0.5,0.5" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar9" RenderTransformOrigin="0.5,0.5" Margin="0,16.394,74,60.242" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True" d:IsLocked="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,86.829" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2" d:IsLocked="True"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1" d:IsLocked="True"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy9" Margin="7.329,385.245,0,44.11" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias10" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,74,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True" d:IsLocked="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias10" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center" d:IsLocked="True"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2" d:IsLocked="True"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,13.856" Grid.ColumnSpan="2" d:IsLocked="True"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1" d:IsLocked="True"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy9" Margin="5,477.266,0,-45.89" Height="109.882" VerticalAlignment="Top" d:IsLocked="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar10" RenderTransformOrigin="0.5,0.5" Margin="-1,11.491,75,61.547" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,89.912" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2" d:IsLocked="True"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1" d:IsLocked="True"/>
+                        </Grid>
+                    </Grid>
+                    <Grid x:Name="Vibrato" Margin="0,10.891,0,-0.264" Width="335" VerticalAlignment="Top" Height="776.286">
+                        <Grid x:Name="M1Bias_Copy" Margin="0,1.228,0,410.836" Background="{x:Null}" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias1" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,79,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias1" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy" Margin="0,98.184,0.5,350.833" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar1" RenderTransformOrigin="0.5,0.5" Margin="3.5,17.109,79.5,28.454" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,58.074" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2" d:IsLocked="True"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1" d:IsLocked="True"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy1" Margin="0,173.245,0,245.778" Background="{x:Null}" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias2" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias2" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2.329,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="69.019,25.854,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy1" Margin="0,263.275,0.5,190.748" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar2" RenderTransformOrigin="0.5,0.5" Margin="0,0,74,31.927" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True" Height="35.47" VerticalAlignment="Bottom">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,46.953" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="78.934,16.9,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy2" Margin="0,318.245,0,100.836" Background="{x:Null}" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias3" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias3" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Right" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="0,35,21.731,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy2" Margin="0,418.275,0.5,0" VerticalAlignment="Top" Height="70.996">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar3" RenderTransformOrigin="0.5,0.5" Margin="1.712,27.078,72.288,390.424" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,419.959" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}" Width="55" Margin="72.288,25,0,0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy3" Margin="0,504.093,0,0" Background="{x:Null}" VerticalAlignment="Top" Height="114.941">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias4" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias4" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy3" Margin="0,434.093,0.5,0" VerticalAlignment="Top" Height="65.146">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar4" RenderTransformOrigin="0.5,0.5" Margin="1.712,27.078,72.288,390.424" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,419.959" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy4" Margin="0,230.887,0,-242.938" Background="{x:Null}" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias5" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias5" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy4" Margin="0,344.151,0.5,-8.154" VerticalAlignment="Top" Height="440.289">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar5" RenderTransformOrigin="0.5,0.5" Margin="1.712,27.078,72.288,390.424" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,419.959" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy5" Margin="0,485.993,0,0" Background="{x:Null}" VerticalAlignment="Top" Height="108.217">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias6" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias6" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy5" Margin="0,894.954,0.5,-1234.919" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar6" RenderTransformOrigin="0.5,0.5" Margin="1.712,27.078,72.288,390.424" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,419.959" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Bias_Copy6" Margin="0,624.122,0,0" Background="{x:Null}" VerticalAlignment="Top" Height="102.105">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="61*"/>
+                                <ColumnDefinition Width="46*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchBias7" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <ToggleButton x:Name="SelectPitchMode1Bias7" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                        </Grid>
+                        <Grid x:Name="M1Var_Copy6" Margin="0,725.99,0.5,-54.736" VerticalAlignment="Top" Height="105.032">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="89*"/>
+                                <ColumnDefinition Width="71*"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="PitchVar7" RenderTransformOrigin="0.5,0.5" Margin="1.712,27.078,72.288,390.424" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                                <Slider.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Slider.RenderTransform>
+                            </Slider>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,5,419.959" Height="Auto" Padding="0,0,0,0" Text="分散値(ぶれ幅)" Grid.ColumnSpan="2"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1"/>
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+                <Grid x:Name="noisesorts" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="85.141" d:IsLocked="True">
+                    <TextBlock TextWrapping="Wrap" Margin="2.329,11.199,1.905,-9.199" Height="Auto" Padding="0,0,0,0" Text="使用するノイズ"/>
+                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="645" Margin="7.329,0,0,19.937" Height="30" SelectedIndex="0">
+                        <ComboBoxItem Content="ホワイトノイズ" HorizontalAlignment="Left" Width="316.212"/>
+                        <ComboBoxItem Content="パーリンノイズ" HorizontalAlignment="Left" Width="316.212"/>
+                    </ComboBox>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+
+    </Grid>
+</Window>
