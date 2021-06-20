@@ -3,6 +3,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections.Generic;
 
+// usingが必要
+using System.Diagnostics;
+
 //忘れずに書いて
 using utauPlugin;
 
@@ -14,7 +17,7 @@ namespace KageBunshin
     public partial class MainWindow : Window
     {
         // ここに書いた変数とかはMainWindowクラスのどこからでも呼び出せるよゾーン
-        //private UtauPlugin utauPlugin;
+        private UtauPlugin utauPlugin;
         // ↓コマンドライン引数ってやつ
         // この配列の0番目にこのソフトの場所が、
         // 1番目にUTAUが出力したプラグイン用データの場所が書いてある
@@ -27,14 +30,16 @@ namespace KageBunshin
             InitializeComponent();
             
             // utauPluginを起動してデータの場所を教える
-           // utauPlugin = new UtauPlugin(args[1]);
+            utauPlugin = new UtauPlugin(args[1]);
             // utauPluginがデータを分析する
-            //utauPlugin.Input();
+            utauPlugin.Input();
 
             // Enter押す＝OKボタン押すのと同義 にする
             KeyDown += (sender, e) =>
             {
-                if (e.Key != Key.Enter) { return; }
+                if (e.Key != Key.Enter) {
+                    return;
+                }
                 OK(sender, e);
             };
         }
@@ -44,7 +49,7 @@ namespace KageBunshin
         {
             try
             {
-                /*
+
                 // utauPlugin.noteは音符(Note)がずらーっと入ったList
                 // Listの中身をひとつずつ取り出して処理するforeach
                 // 今処理してるNoteをnoteと呼ぶ
@@ -55,27 +60,29 @@ namespace KageBunshin
 
                     /*処理***/
 
-                    /*
-					if (SelModBox.IsChecked.Value)
-					{
-						int newMod = ((SelectModBias.IsChecked.Value)? note.GetMod()  : (int)ModBias.Value ) + makeRund((int)ModVar.Value);
-						note.SetMod(newMod);
-					}
 
-					//VO+PU
-					if (SelVO_PUBox.IsChecked.Value) 
-					{
-						double newPu = ((SelectPUBias.IsChecked.Value)? note.GetAtPre() : note.GetPre()+PUBias.Value) + makeRund((int)PUvar.Value);
+                    if (SelectModulationBox.IsChecked.Value)
+                    {
+                        int newMod = ((SelectModulationBias.IsChecked.Value) ? note.GetMod() : (int)ModulationBias.Value) + makeRund((int)ModulationVariance.Value);
+                        note.SetMod(newMod);
+                    }
 
-						double newOv = ((SelectVOBias.IsChecked.Value) ? note.GetAtOve() : note.GetOve()+PUBias.Value) + makeRund((int)PUvar.Value);
+                    //VO+PU
+                    if (SelectVoiceOverlap_PreUtteranceBox.IsChecked.Value)
+                    {
+                        double newPu = ((SelectPreUtteranceBias.IsChecked.Value) ? note.GetAtPre() : note.GetPre() + PreUtteranceBias.Value) + makeRund((int)PreUtteranceVariance.Value);
 
-						if (newOv >= newPu){
-							double temp = newPu;
-							newPu = newOv;
-							newOv = temp;
-						}
+                        double newOv = ((SelectVoiceOverlapBias.IsChecked.Value) ? note.GetAtOve() : note.GetOve() + VoiceOverlapBias.Value) + makeRund((int)VoiceOverlapVariance.Value);
 
-						note.SetPre(newPu.ToString());
+                        if (newOv >= newPu)
+                        {
+                            double temp = newPu;
+                            newPu = newOv;
+                            newOv = temp;
+                        }
+
+                        note.SetPre(newPu.ToString());
+                        note.SetOve(newOv.ToString());
 
                         //HopeTodo:エンベロープの最適化
                         /*https://github.com/delta-kimigatame/utauPlugin
@@ -91,21 +98,29 @@ namespace KageBunshin
                          
                     }
 
+                        */
+                       
+
+                        
+                    }
 
                     //Velocity
-                    if (SelVeloBox.IsChecked.Value)
-					{
-						int newVelocity = (SelectVelocityBias.IsChecked.Value ? note.GetVelocity()  : (int)VelocityBias.Value ) + makeRund((int)VelocityVar.Value);
-						if (newVelocity < 0) newVelocity = 0;
-						else if (200 < newVelocity) newVelocity = 200;
-						note.SetVelocity(newVelocity);
-					}
+                    if (SelectVelocityBox.IsChecked.Value)
+                    {
+                        int newVelocity = (SelectVelocityBias.IsChecked.Value ? note.GetVelocity() : (int)VelocityBias.Value) + makeRund((int)VelocityVariance.Value);
+                        if (newVelocity < 0) newVelocity = 0;
+                        else if (200 < newVelocity) newVelocity = 200;
+                        note.SetVelocity(newVelocity);
+                    }
 
                     //string:Flags
                     if (SelFlagsBox.IsChecked.Value)
-					{
+                    {
                         string fixedFlagsSorts = FixedFlagsSorts.Text;
                         string fixedFlagsValue = FixedFlagsSorts.Text;
+
+                        //ErrorOpen();
+                        MessageBox.Show(fixedFlagsSorts + "\n" + fixedFlagsValue,"debug");
 
                         string variableFlagsSorts = VariableFlagsSorts.Text;
                         string variableFlagsBiasValue = SelectFlagsBias.IsChecked.Value ? note.GetFlags() : VariableFlagsVarValue.Text;
@@ -117,25 +132,27 @@ namespace KageBunshin
                         string[] variableSplitedBiasValue = variableFlagsBiasValue.Split(delimiterChars);
                         string[] variableSplitedVarValue = variableFlagsVarValue.Split(delimiterChars);
                         string[] variableSplitedNewValue = { };
-                        for (int i = 0; i < variableSplitedFlagsSort.Length; i++) {
+                        for (int i = 0; i < variableSplitedFlagsSort.Length; i++)
+                        {
                             Array.Resize(ref variableSplitedNewValue, variableSplitedNewValue.Length + 1);
-                            variableSplitedNewValue[variableSplitedNewValue.Length - 1] =""+ Int32.Parse(variableSplitedBiasValue[i]) + makeRund(Int32.Parse(variableSplitedVarValue[i]));
+                            variableSplitedNewValue[variableSplitedNewValue.Length - 1] = "" + Int32.Parse(variableSplitedBiasValue[i]) + makeRund(Int32.Parse(variableSplitedVarValue[i]));
                         }
 
                         //"[固定フラグ種類=固定フラグ値]*,[変動フラグ=新しい変動フラグ値]*"の書式で1つの文字列にする
                         string[] fixedSplitedFlagsSort = fixedFlagsSorts.Split(delimiterChars);
                         string[] fixedSplitedValue = fixedFlagsValue.Split(delimiterChars);
                         string newFlags = "";
-                        for (int i = 0; i < fixedSplitedFlagsSort.Length; i++) newFlags += fixedSplitedFlagsSort[i] +"="+fixedSplitedValue[i];
+                        for (int i = 0; i < fixedSplitedFlagsSort.Length; i++) newFlags += fixedSplitedFlagsSort[i] + "=" + fixedSplitedValue[i];
                         for (int i = 0; i < variableSplitedFlagsSort.Length; i++) newFlags += variableSplitedFlagsSort[i] + "=" + variableSplitedNewValue[i];
                         //値のセット
                         note.SetFlags(newFlags);
 
                     }
 
-					//Pitch
-					if (SelPitBox.IsChecked.Value)
-					{
+                    /*
+                    //Pitch
+                    if (SelPitBox.IsChecked.Value)
+                    {
 
                         if (PitchModeSelecter.SelectedIndex == 0) {//mode1
                             List<int> newPitches = new List<int>() { };
@@ -164,18 +181,22 @@ namespace KageBunshin
                                 FadeoutTime	float	ビブラート長に対するフェードアウトの割合
                                 Phase	float	ビブラートの初期位相のずれ
                                 Height	float	ビブラートの音程オフセット
-                             
+
                         }
                         else//未選択の例外
                         {
                             throw new Exception("PitchModeが選択されませんでした");
                         }
-					}
-				}
-
-                // UTAU本体に処理したデータを返す
-                utauPlugin.Output();
+                    }
+                }
                     */
+
+                    //ErrorOpen("debug/n");
+
+                    // UTAU本体に処理したデータを返す
+                    utauPlugin.Output();
+                }
+                 
             }
             catch // try中にエラー吐いたとき、落ちない代わりに↓が実行される
             {
@@ -204,13 +225,12 @@ namespace KageBunshin
             errorDrawer.IsBottomDrawerOpen = true;
         }
 
-		//特定範囲内でランダム値を返すメソッド
-		public int makeRund(int variance)
-        {
-			int seed = Environment.TickCount;
+        Random rnd = new Random(Environment.TickCount);
 
-			Random rnd = new Random(seed*variance);
-			return rnd.Next(variance)  -rnd.Next(variance);
+        //特定範囲内でランダム値を返すメソッド
+        public int makeRund(int variance)
+        {			
+			return rnd.Next(variance)  -2 * rnd.Next(variance);
         }
     }
                 }

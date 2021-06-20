@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:KageBunshin"
         mc:Ignorable="d" FontSize="13"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
-        Title="適度にUSTを汚すプラグイン『しちへんげ』" Height="667" Width="1044"
+        Title="適度にUSTを汚すプラグイン『しちへんげ』" Height="699" Width="623"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <Grid x:Name="MainPanel" HorizontalAlignment="Left" Width="1030" Margin="4,2,0,-1">
@@ -91,29 +91,51 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="0" x:Name="SelectVO_PU" Padding="0,9" Margin="10,10,10,10" >
+        <GroupBox Grid.Row="1" Grid.Column="0" x:Name="SelectVO_PU" Padding="0,9" Margin="10,10,10,10" d:IsLocked="True" >
             <GroupBox.Header>
-                <CheckBox x:Name="SelVO_PUBox" Content="先行発声＋オーバーラップをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
+                <CheckBox x:Name="SelectVoiceOverlap_PreUtteranceBox" Content="先行発声＋オーバーラップをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
             </GroupBox.Header>
-            <StackPanel x:Name="SelectVO_PU1" Margin="0,-4,0,0" Width="321" IsEnabled="{Binding IsChecked, ElementName=SelVO_PUBox}">
-                <Grid x:Name="PUBias1" Height="110" Margin="0" Background="{x:Null}">
-                    <Slider x:Name="PUBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,159,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPUBias}" IsDirectionReversed="True">
+            <StackPanel x:Name="PanelVoiceOverlap_PreUtterance" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelectVoiceOverlap_PreUtteranceBox}">
+                <Grid x:Name="PreUtteranceBiasArea" Background="{x:Null}" Height="89">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="0*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="49" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Margin="10,0,0,0"><Run Text="先行発声-基準値"/><LineBreak/><Run/></TextBlock>
+                    <Slider Grid.Row="0" Grid.Column="0" x:Name="PreUtteranceBias" RenderTransformOrigin="0.5,0.5" Minimum="-10" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPreUtteranceBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1" Maximum="100" Value="-1">
                         <Slider.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <ScaleTransform/>
                                 <SkewTransform/>
-                                <RotateTransform/>
+                                <RotateTransform Angle="180"/>
                                 <TranslateTransform/>
                             </TransformGroup>
                         </Slider.RenderTransform>
                     </Slider>
-                    <ToggleButton x:Name="SelectPUBias" Content="" Height="24" Margin="5.5,66,265,20"/>
-                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0"><Run Text="先行発声 基準値"/></TextBlock>
-                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらにぶらす"/></TextBlock>
-                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PUBias}" Width="55" Margin="250.5,35,0,0"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=PreUtteranceBias}" Margin="10,10,-60,10" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Margin="0,5,0,0" HorizontalAlignment="Right" Width="128.16" ><Run Text="現在の値からさらにぶらす"/></TextBlock>
+                    <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="SelectPreUtteranceBias" Content="" Margin="0,0,-70,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" Height="25" />
                 </Grid>
-                <Grid Height="114" Margin="0,0,0.5,0">
-                    <Slider x:Name="PUvar" RenderTransformOrigin="0.5,0.5" Margin="0.5,7,73.5,67" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True">
+                <Grid x:Name="PreUtteranceVarianceArea" RenderTransformOrigin="0.5,0.5" Height="56.29" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="195*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform />
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <TextBlock Grid.Column="0" TextWrapping="Wrap" Margin="0" Height="Auto" Padding="0,0,0,0" Text="先行発声-分散値(ぶれ幅)"/>
+                    <Slider Grid.Column="0" x:Name="PreUtteranceVariance" RenderTransformOrigin="0.5,0.5" Margin="0,0,0,0" Minimum="-10" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True" Width="180" HorizontalAlignment="Left" VerticalAlignment="Center" d:IsHidden="True" >
                         <Slider.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform ScaleY="-1" ScaleX="-1"/>
@@ -123,27 +145,48 @@
                             </TransformGroup>
                         </Slider.RenderTransform>
                     </Slider>
-                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,87" Height="Auto" Padding="0,0,0,0" Text="先行発声 分散値(ぶれ幅)"/>
-                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PUvar}" Width="55" Margin="250.5,25,0,0"/>
+                    <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=PreUtteranceVariance}" Margin="10,11" VerticalAlignment="Center"/>
                 </Grid>
-                <Grid Height="110" Margin="0" Background="{x:Null}">
-                    <Slider x:Name="OVBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVOBias}" IsDirectionReversed="True">
+                <Grid x:Name="VoiceOverlapBiasArea" Background="{x:Null}" Height="89">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="0*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="49" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Margin="10,0,0,0"><Run Text="オーバーラップ-基準値"/><LineBreak/><Run/></TextBlock>
+                    <Slider Grid.Row="0" Grid.Column="0" x:Name="VoiceOverlapBias" RenderTransformOrigin="0.5,0.5" Maximum="50" Minimum="-50" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVoiceOverlapBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1">
                         <Slider.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                                <ScaleTransform/>
                                 <SkewTransform/>
-                                <RotateTransform/>
+                                <RotateTransform Angle="180"/>
                                 <TranslateTransform/>
                             </TransformGroup>
                         </Slider.RenderTransform>
                     </Slider>
-                    <ToggleButton x:Name="SelectVOBias" Content="" Height="24" Margin="5.5,66,265,20"/>
-                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0"><Run Text="オーバーラップ 基準値"/><LineBreak/><Run/></TextBlock>
-                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
-                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=OVBias}" Width="55" Margin="250.5,35,0,0"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=VoiceOverlapBias}" Margin="10,10,-60,10" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Margin="0,5,0,0" HorizontalAlignment="Right" Width="128.16" ><Run Text="現在の値からさらにぶらす"/></TextBlock>
+                    <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="SelectVoiceOverlapBias" Content="" Margin="0,0,-70,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" Height="25" />
                 </Grid>
-                <Grid Height="114" Margin="0,0,0.5,0">
-                    <Slider x:Name="OVvar" RenderTransformOrigin="0.5,0.5" Margin="0.5,7,73.5,67" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True">
+                <Grid x:Name="VoiceOverlapVarianceArea" RenderTransformOrigin="0.5,0.5" Height="56.29" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="195"/>
+                        <ColumnDefinition Width="195*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform />
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <TextBlock Grid.Column="0" TextWrapping="Wrap" Margin="0" Height="Auto" Padding="0,0,0,0" Text="オーバーラップ-分散値(ぶれ幅)"/>
+                    <Slider Grid.Column="0" x:Name="VoiceOverlapVariance" RenderTransformOrigin="0.5,0.5" Margin="0,0,0,0" Maximum="50" Minimum="-45" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsDirectionReversed="True" Width="180" HorizontalAlignment="Left" VerticalAlignment="Center" d:IsHidden="True" >
                         <Slider.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform ScaleY="-1" ScaleX="-1"/>
@@ -153,8 +196,7 @@
                             </TransformGroup>
                         </Slider.RenderTransform>
                     </Slider>
-                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,92" Height="Auto" Padding="0,0,0,0" Text="オーバーラップ 分散値(ぶれ幅)"/>
-                    <TextBox Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=OVvar}" Width="55" Margin="250.5,25,0,0"/>
+                    <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Value, ElementName=VoiceOverlapVariance}" Margin="10,11" VerticalAlignment="Center"/>
                 </Grid>
             </StackPanel>
         </GroupBox>
@@ -162,7 +204,7 @@
             <GroupBox.Header>
                 <CheckBox x:Name="SelectVelocityBox" Content="子音速度をランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
             </GroupBox.Header>
-            <StackPanel x:Name="PanelVelocity" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelectVelocityBox}">
+            <StackPanel x:Name="PanelVelocity" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelectVelocityBox}" d:IsLocked="True">
                 <Grid x:Name="VelocityBiasArea" Background="{x:Null}" Height="89">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="195"/>
@@ -174,7 +216,7 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Margin="10,0"><Run Text="基準値"/><LineBreak/><Run/></TextBlock>
-                    <Slider Grid.Row="0" Grid.Column="0" x:Name="VelocityBias" RenderTransformOrigin="0.5,0.5" Maximum="100" Minimum="-100" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVelocityBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1">
+                    <Slider Grid.Row="0" Grid.Column="0" x:Name="VelocityBias" RenderTransformOrigin="0.5,0.5" Maximum="200" Minimum="50" TickPlacement="TopLeft" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectVelocityBias}" IsDirectionReversed="True" Margin="7.5,12.5" Grid.ColumnSpan="1" Value="100">
                         <Slider.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform/>
@@ -216,32 +258,40 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="1" x:Name="SelectFlags" Margin="10,10,10,10" Padding="0,9">
+        <GroupBox Grid.Row="1" Grid.Column="1" x:Name="SelectFlags" Margin="10,10,10,10" Padding="0,9" d:IsLocked="True">
             <GroupBox.Header>
                 <CheckBox x:Name="SelFlagsBox" Content="フラグをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
             </GroupBox.Header>
-            <StackPanel x:Name="SelectModulation2" Margin="0,-5,0,-10" Width="321" IsEnabled="{Binding IsChecked, ElementName=SelFlagsBox}">
-                <Grid Height="67.5" Margin="0" Background="{x:Null}">
-                    <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,35" Height="Auto" Padding="0,0,0,0" Text="値を固定するフラグ"/>
-                    <TextBox x:Name="FixedFlagsSorts" Height="30" TextWrapping="Wrap" Text="Y,a" Width="300" Margin="5.5,35,0,0" FontSize="14"/>
+            <StackPanel x:Name="SelectModulation2" Margin="10,0" IsEnabled="{Binding IsChecked, ElementName=SelFlagsBox}">
+                <Grid x:Name="FixedFlags" Margin="0" Background="{x:Null}" Height="46.346" d:IsLocked="True">
+                    <TextBlock TextWrapping="Wrap" Margin="0" Height="Auto" Padding="0,0,0,0" Text="値を固定するフラグ"/>
+                    <TextBox x:Name="FixedFlagsSorts" TextWrapping="Wrap" Text="Y,a" Margin="0,18.726,0,0" FontSize="14"/>
                 </Grid>
-                <Grid Height="95" Margin="0,0,0.5,0">
-                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,0" Height="55" Padding="0,0,0,0" Text="設定値(上のフラグと順番対応)"/>
-                    <TextBox x:Name="FixedFlagsValue" Height="28" TextWrapping="Wrap" Text="0,100" Width="300" Margin="5.5,25,0,0"/>
+                <Grid Margin="0" d:IsLocked="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="44*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock TextWrapping="Wrap" Margin="0,10.645,0,-9.356" Height="55" Padding="0,0,0,0" Text="設定値(上のフラグと順番対応)" Grid.ColumnSpan="2"/>
+                    <TextBox x:Name="FixedFlagsValue" TextWrapping="Wrap" Text="0,100" Margin="0,28.71,0,1.289" Grid.ColumnSpan="2"/>
                 </Grid>
                 <Grid Height="60" Margin="0,0,0.5,0">
-                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,0" Height="55" Padding="0,0,0,0" Text="値を変更するフラグ"/>
-                    <TextBox x:Name="VariableFlagsSorts" Height="30" TextWrapping="Wrap" Text="B,g" Width="300" Margin="5.5,25,0,0" FontSize="14"/>
+                    <TextBlock TextWrapping="Wrap" Margin="2.912,8.711,2.912,26.289" Padding="0,0,0,0" Text="値を変更するフラグ"/>
+                    <TextBox x:Name="VariableFlagsSorts" TextWrapping="Wrap" Text="B,g" Margin="0,18.711,0,11.289" FontSize="14"/>
                 </Grid>
                 <Grid Height="110" Margin="0" Background="{x:Null}">
-                    <ToggleButton x:Name="SelectFlagsBias" Content="" Height="24" Margin="5.5,66,265,20"/>
+                    <ToggleButton x:Name="SelectFlagsBias" Content="" Margin="0,53.711,15,31.289" HorizontalAlignment="Right" Width="65"/>
                     <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,85" Height="Auto" Padding="0,0,0,0" ><Run Text="基準値"/><Run Text="(上のフラグと順番対応)"/><LineBreak/><Run/></TextBlock>
-                    <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
-                    <TextBox x:Name="VariableFlagsBiasValue" Height="30" TextWrapping="Wrap" Text="50,0" Width="300" Margin="5.5,35,0,0" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectFlagsBias}"/>
+                    <TextBlock TextWrapping="Wrap" Margin="60,58.711,65,31.289"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                    <TextBox x:Name="VariableFlagsBiasValue" TextWrapping="Wrap" Text="50,0" Margin="0,18.711,0,56.289" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectFlagsBias}"/>
                 </Grid>
                 <Grid Height="114" Margin="0,0,0.5,0">
-                    <TextBlock TextWrapping="Wrap" Margin="0,0,5,87" Height="Auto" Padding="0,0,0,0"><Run Text="分散値"/><Run Text="(上のフラグと順番対応)"/></TextBlock>
-                    <TextBox x:Name="VariableFlagsVarValue" Height="30" TextWrapping="Wrap" Text="20,5" Width="300" Margin="5.5,25,0,0"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="36*"/>
+                        <ColumnDefinition Width="17*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock TextWrapping="Wrap" Margin="5,-31.289,-5,125.289" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="分散値"/><Run Text="(上のフラグと順番対応)"/></TextBlock>
+                    <TextBox x:Name="VariableFlagsVarValue" TextWrapping="Wrap" Text="20,5" Margin="5,-16.288,4.5,105.289" Grid.ColumnSpan="2"/>
                 </Grid>
             </StackPanel>
         </GroupBox>
@@ -257,21 +307,21 @@
             <GroupBox.Header>
                 <CheckBox x:Name="SelPitBox" Content="ピッチ/ビブラートをランダムに設定" Background="#FFFF9700" IsChecked="True" Margin="15,0,25,0"/>
             </GroupBox.Header>
-            <StackPanel x:Name="PanelPitches" Margin="0,-6.972,0,-1.943" Width="659.234" IsEnabled="{Binding IsChecked, ElementName=SelPitBox}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="893.917">
-                <Grid x:Name="ModeSelecter" Height="30.887" Width="655" Margin="2.329,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <StackPanel x:Name="PanelPitches" IsEnabled="{Binding IsChecked, ElementName=SelPitBox}">
+                <Grid x:Name="ModeSelecter">
                     <ComboBox x:Name="PitchModeSelecter" VerticalAlignment="Top" SelectedIndex="1" Margin="0,0.858,0,0" HorizontalAlignment="Left" Width="645" Height="30">
                         <ComboBoxItem x:Name="Mode1" Content="Mode1" HorizontalAlignment="Left" Width="319"/>
                         <ComboBoxItem x:Name="Mode2" Content="Mode2" HorizontalAlignment="Left" Width="319"/>
                     </ComboBox>
                 </Grid>
-                <StackPanel Height="786.913" Width="657.329" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Grid x:Name="Poltament" Height="544.851" Width="322.329" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="399" Height="423.171">
+                    <Grid x:Name="Poltament" Height="544.851" Width="194" VerticalAlignment="Top">
                         <Grid x:Name="M1Bias" Margin="0,28.522,0,399.271" Background="{x:Null}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:IsHidden="True">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="61*"/>
                                 <ColumnDefinition Width="46*"/>
                             </Grid.ColumnDefinitions>
-                            <Slider x:Name="PitchBias" RenderTransformOrigin="0.5,0.5" Margin="0.5,20,73.5,54" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True">
+                            <Slider x:Name="PitchBias" RenderTransformOrigin="0.5,0.5" Margin="0" Maximum="100" Minimum="-100" TickPlacement="TopLeft" SmallChange="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsChecked, Converter={StaticResource BoolNeg}, ElementName=SelectPitchMode1Bias}" Grid.ColumnSpan="2" IsDirectionReversed="True" d:IsLocked="True">
                                 <Slider.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform ScaleY="-1" ScaleX="-1"/>
@@ -281,12 +331,12 @@
                                     </TransformGroup>
                                 </Slider.RenderTransform>
                             </Slider>
-                            <ToggleButton x:Name="SelectPitchMode1Bias" Content="" Height="24" Margin="5.5,66,127.212,20" VerticalAlignment="Center"/>
-                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
-                            <TextBlock TextWrapping="Wrap" Margin="60.5,70,115,21.13" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
-                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1"/>
+                            <ToggleButton x:Name="SelectPitchMode1Bias" Content="" Height="24" Margin="0,0,0,20" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0.5,2,4.5,87.972" Height="Auto" Padding="0,0,0,0" Grid.ColumnSpan="2" d:IsLocked="True"><Run Text="ピッチにつけるバイアス(基準値)"/><LineBreak/><Run/></TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0" Grid.ColumnSpan="2"><Run Text="現在の値からさらに"/><Run Text="ぶらす"/></TextBlock>
+                            <TextBox HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchBias}" VerticalAlignment="Top" Width="55" Margin="67.288,35,0,0" Grid.Column="1" d:IsLocked="True"/>
                         </Grid>
-                        <Grid x:Name="M1Var" Margin="0,130.887,0,290.981" d:IsHidden="True">
+                        <Grid x:Name="M1Var" Margin="0,130.887,0,290.981" d:IsHidden="True" d:IsLocked="True">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="89*"/>
                                 <ColumnDefinition Width="71*"/>
@@ -419,7 +469,7 @@
                             <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding Value, ElementName=PitchVar}"  VerticalAlignment="Top" Width="55" Margin="72.288,25,0,0" Grid.Column="1" d:IsLocked="True"/>
                         </Grid>
                     </Grid>
-                    <Grid x:Name="Vibrato" Margin="0,10.891,0,-0.264" Width="335" VerticalAlignment="Top" Height="776.286">
+                    <Grid x:Name="Vibrato" Margin="0,10.891,0,-0.264" VerticalAlignment="Top" Width="205" Height="770">
                         <Grid x:Name="M1Bias_Copy" Margin="0,1.228,0,410.836" Background="{x:Null}" VerticalAlignment="Top">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="61*"/>
